@@ -1,10 +1,29 @@
-# Repository template for code repositories
+# Hotelly
 
-This template contains the following:
+A showcase demoing hotel booking and management, designed applying service-oriented architecture (SOA) principles.
 
-- Default `.editorconfig` and `.gitignore` for .NET projects
-- Dependabot GitHub Action to enable auto-merge for Dependabot PRs
-- [MarkdownSnippets](https://github.com/SimonCropp/MarkdownSnippets) GitHub Action
-- An issue template to complete the repository configuration once the new repository has been generated
-- CI GitHub Actions to build, run tests, and push tags to Feedz.io
-- The included sample project defines item groups to produce NuGet packages
+Hotelly is made of the following services:
+
+- **Registry:** hotels, their location, stars, and amenities.
+- **Reservations:** rooms availability and bookings.
+- **Marketing:** ratings and reviews.
+- **Sales:** nightly rates.
+
+## Searching, paging, and sorting
+
+The first scenario Hotelly demos is a hotel search page: filtering, faceting, sorting, and paging data owned by different services. Search uses a dedicated PostgreSQL database, with one schema per service. Each service has a database role that can write only to its own schema, and the search process has a role that can only read. The search results page is then composed using [ServiceComposer](https://github.com/ServiceComposer/ServiceComposer.AspNetCore).
+
+## Requirements
+
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [Docker](https://www.docker.com/)
+
+## How to run
+
+Start the infrastructure:
+
+```shell
+docker compose up -d
+```
+
+To start from scratch, remove the database volume with `docker compose down -v`.
