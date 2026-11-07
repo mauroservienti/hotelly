@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="Hotelly.AppHost/Hotelly.AppHost.csproj" />
+  <Project Path="Search.Tests/Search.Tests.csproj" />
   <Project Path="Search/Search.csproj" />
 </Solution>

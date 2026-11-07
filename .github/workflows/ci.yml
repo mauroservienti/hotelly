@@ -21,4 +21,4 @@ jobs:
       - name: Build
         run: dotnet build src --configuration Release
       - name: Tests
-        run: dotnet test src --configuration Release --no-build
+        run: dotnet test --solution src/Hotelly.slnx --configuration Release --no-build
