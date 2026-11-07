@@ -16,14 +16,14 @@ The first scenario Hotelly demos is a hotel search page: filtering, faceting, so
 ## Requirements
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- [Docker](https://www.docker.com/)
+- [Docker](https://www.docker.com/), or another container runtime supported by [Aspire](https://aspire.dev/)
 
 ## How to run
 
-Start the infrastructure:
+Hotelly uses Aspire to start everything it needs:
 
 ```shell
-docker compose up -d
+dotnet run --project src/Hotelly.AppHost
 ```
 
-To start from scratch, remove the database volume with `docker compose down -v`.
+The Aspire dashboard opens in the browser. From there, pgAdmin gives access to the search database. The PostgreSQL container has no data volume: every run starts from scratch.
