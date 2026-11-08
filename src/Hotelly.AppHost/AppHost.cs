@@ -16,6 +16,7 @@ var searchServer = builder.AddPostgres("search-db")
 var registryApi = AddService<Projects.Registry_Api>("registry");
 var salesApi = AddService<Projects.Sales_Api>("sales");
 var reservationsApi = AddService<Projects.Reservations_Api>("reservations");
+var marketingApi = AddService<Projects.Marketing_Api>("marketing");
 
 // The gateway hosts the search process and the services' search providers.
 // It reads from the search database with the read-only search role.
@@ -24,7 +25,8 @@ builder.AddProject<Projects.CompositionGateway>("composition-gateway")
     .WaitFor(searchServer)
     .WaitFor(registryApi)
     .WaitFor(salesApi)
-    .WaitFor(reservationsApi);
+    .WaitFor(reservationsApi)
+    .WaitFor(marketingApi);
 
 builder.Build().Run();
 

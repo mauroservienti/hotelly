@@ -5,6 +5,7 @@
     <ProjectReference Include="..\Registry.Search\Registry.Search.csproj" />
     <ProjectReference Include="..\Sales.Search\Sales.Search.csproj" />
     <ProjectReference Include="..\Reservations.Search\Reservations.Search.csproj" />
+    <ProjectReference Include="..\Marketing.Search\Marketing.Search.csproj" />
   </ItemGroup>
 
 </Project>

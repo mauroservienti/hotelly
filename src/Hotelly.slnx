@@ -3,6 +3,9 @@
   <Project Path="Hotelly.AppHost/Hotelly.AppHost.csproj" />
   <Project Path="Hotelly.Replication/Hotelly.Replication.csproj" />
   <Project Path="Hotelly.Seed/Hotelly.Seed.csproj" />
+  <Project Path="Marketing.Api/Marketing.Api.csproj" />
+  <Project Path="Marketing.Search.Tests/Marketing.Search.Tests.csproj" />
+  <Project Path="Marketing.Search/Marketing.Search.csproj" />
   <Project Path="Registry.Api/Registry.Api.csproj" />
   <Project Path="Registry.Search.Tests/Registry.Search.Tests.csproj" />
   <Project Path="Registry.Search/Registry.Search.csproj" />

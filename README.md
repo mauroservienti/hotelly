@@ -32,10 +32,10 @@ The Aspire dashboard opens in the browser. From there, pgAdmin gives access to t
 
 ## Try it
 
-The composition gateway exposes the search at `/search`. For example, hotels in Rome with 4 or 5 stars and a pool, sorted by stars:
+The composition gateway exposes the search at `/search`. For example, hotels in Rome with 4 or 5 stars and a pool, available from February 12 to 15, 2027, sorted by stars, then by rating:
 
 ```shell
-curl "http://localhost:5100/search?city=Rome&stars=4,5&amenities=pool&orderBy=stars:desc"
+curl "http://localhost:5100/search?city=Rome&stars=4,5&amenities=pool&checkIn=2027-02-12&checkOut=2027-02-15&orderBy=stars:desc,rating:desc"
 ```
 
 The response contains a page of hotel IDs, the total number of matching hotels, and the facets. `checkIn`, `checkOut`, `orderBy`, `page`, and `pageSize` are reserved; every other parameter is a filter, handled by the service that owns it.
