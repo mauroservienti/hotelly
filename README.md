@@ -29,3 +29,23 @@ dotnet run --project src/Hotelly.AppHost
 ```
 
 The Aspire dashboard opens in the browser. From there, pgAdmin gives access to the databases. The PostgreSQL containers have no data volume: every run starts from scratch, and each service seeds its own data at startup.
+
+## Try it
+
+The composition gateway exposes the search at `/search`. For example, hotels in Rome with 4 or 5 stars and a pool, sorted by stars:
+
+```shell
+curl "http://localhost:5100/search?city=Rome&stars=4,5&amenities=pool&orderBy=stars:desc"
+```
+
+The response contains a page of hotel IDs, the total number of matching hotels, and the facets. `checkIn`, `checkOut`, `orderBy`, `page`, and `pageSize` are reserved; every other parameter is a filter, handled by the service that owns it.
+
+## Search providers
+
+Services take part in the search by deploying providers in the composition gateway, the same way they deploy composition handlers. The search process starts from the hotels, provided by Registry, and knows nothing about the services' data: providers build the queries, and everything runs in the search database.
+
+- **Filters:** every filter provider runs on every request. Each one reads the filters it owns, like `city` or `amenities`, and does nothing when they're missing.
+- **Facets:** every facet provider runs on every request, over the filtered hotels, before paging.
+- **Sorts:** only the requested ones run, in the requested order. `orderBy=stars:desc,price` sorts by stars first, then by price. That's why sort providers expose a `Key`: the search process picks the provider for each requested key, and tells it whether it's the first sort (`OrderBy`) or a following one (`ThenBy`). Without keys, providers owned by different services would have to agree among themselves on who goes first. Keys also make conflicts visible: if two services claim the same key, the gateway fails at startup.
+
+Filter names and sort keys are the contract search imposes on services and on the UI. Hotelly is a demo, so filters don't declare their names: unknown filters are silently ignored, and nothing detects two services handling the same filter. Giving filter providers a key, like sort providers, would fix both.
