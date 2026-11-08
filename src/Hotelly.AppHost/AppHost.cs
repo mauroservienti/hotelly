@@ -11,6 +11,12 @@ var searchServer = builder.AddPostgres("search-db")
     .WithImageTag("18")
     .WithEnvironment("POSTGRES_DB", "search")
     .WithInitFiles("../../postgres")
+    // Each subscription takes a logical replication worker, plus up to two
+    // more while it copies the initial data. The default, 4 workers, isn't
+    // enough for four services: the last subscriptions never get their
+    // initial copy. Logical replication workers count toward the worker
+    // processes too.
+    .WithArgs("-c", "max_logical_replication_workers=16", "-c", "max_worker_processes=24")
     .WithPgAdmin();
 
 var registryApi = AddService<Projects.Registry_Api>("registry");
