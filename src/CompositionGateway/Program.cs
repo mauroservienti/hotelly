@@ -1,4 +1,5 @@
 using CompositionGateway;
+using Marketing.Search;
 using Registry.Search;
 using Reservations.Search;
 using Sales.Search;
@@ -12,7 +13,8 @@ builder.Services.AddHotelSearch(
     builder.Configuration.GetConnectionString("search")!,
     RegistrySearch.Assembly,
     SalesSearch.Assembly,
-    ReservationsSearch.Assembly);
+    ReservationsSearch.Assembly,
+    MarketingSearch.Assembly);
 
 var app = builder.Build();
 
