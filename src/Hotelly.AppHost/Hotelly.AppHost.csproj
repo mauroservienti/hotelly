@@ -11,4 +11,8 @@
     <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.6.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Registry.Api\Registry.Api.csproj" />
+  </ItemGroup>
+
 </Project>
