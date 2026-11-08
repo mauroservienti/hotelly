@@ -15,6 +15,7 @@
   <Project Path="Sales.Api/Sales.Api.csproj" />
   <Project Path="Sales.Search.Tests/Sales.Search.Tests.csproj" />
   <Project Path="Sales.Search/Sales.Search.csproj" />
+  <Project Path="Search.Composition/Search.Composition.csproj" />
   <Project Path="Search.Tests/Search.Tests.csproj" />
   <Project Path="Search/Search.csproj" />
 </Solution>

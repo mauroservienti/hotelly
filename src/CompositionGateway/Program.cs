@@ -1,9 +1,9 @@
-using CompositionGateway;
 using Marketing.Search;
 using Registry.Search;
 using Reservations.Search;
 using Sales.Search;
 using Search;
+using ServiceComposer.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,9 +16,12 @@ builder.Services.AddHotelSearch(
     ReservationsSearch.Assembly,
     MarketingSearch.Assembly);
 
+// Composition handlers are found by scanning the assemblies deployed with the
+// gateway.
+builder.Services.AddViewModelComposition();
+
 var app = builder.Build();
 
-app.MapGet("/search", (HttpRequest request, HotelSearch search, CancellationToken cancellationToken) =>
-    search.Search(SearchRequestParser.Parse(request.Query), cancellationToken));
+app.MapCompositionHandlers();
 
 app.Run();

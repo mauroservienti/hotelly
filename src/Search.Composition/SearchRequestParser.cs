@@ -1,7 +1,8 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Search;
 
-namespace CompositionGateway;
+namespace Search.Composition;
 
 /// <summary>
 /// Turns a query string into a search request:

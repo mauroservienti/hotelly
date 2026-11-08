@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Search\Search.csproj" />
+    <ProjectReference Include="..\Search.Composition\Search.Composition.csproj" />
     <ProjectReference Include="..\Registry.Search\Registry.Search.csproj" />
     <ProjectReference Include="..\Sales.Search\Sales.Search.csproj" />
     <ProjectReference Include="..\Reservations.Search\Reservations.Search.csproj" />
