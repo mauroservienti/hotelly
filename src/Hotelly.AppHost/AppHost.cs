@@ -23,7 +23,7 @@ var registryServer = builder.AddPostgres("registry-db")
     .WithPgAdmin();
 var registryDatabase = registryServer.AddDatabase("registry");
 
-builder.AddProject<Projects.Registry_Api>("registry-api")
+var registryApi = builder.AddProject<Projects.Registry_Api>("registry-api")
     .WithReference(registryDatabase)
     .WithEnvironment("ConnectionStrings__search", SearchConnectionString(searchServer, "registry"))
     // The search database connects to Registry's server from its container,
@@ -32,6 +32,13 @@ builder.AddProject<Projects.Registry_Api>("registry-api")
         $"host={registryServer.Resource.Name} port=5432 dbname=registry user=postgres password={registryServer.Resource.PasswordParameter}"))
     .WaitFor(registryDatabase)
     .WaitFor(searchServer);
+
+// The gateway hosts the search process and the services' search providers.
+// It reads from the search database with the read-only search role.
+builder.AddProject<Projects.CompositionGateway>("composition-gateway")
+    .WithEnvironment("ConnectionStrings__search", SearchConnectionString(searchServer, "search"))
+    .WaitFor(searchServer)
+    .WaitFor(registryApi);
 
 builder.Build().Run();
 

@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Registry.Api\Registry.Api.csproj" />
+    <ProjectReference Include="..\CompositionGateway\CompositionGateway.csproj" />
   </ItemGroup>
 
 </Project>
