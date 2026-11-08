@@ -16,7 +16,10 @@ var searchServer = builder.AddPostgres("search-db")
 var registryServer = builder.AddPostgres("registry-db")
     .WithImageTag("18")
     // Logical replication publishes changes to the search database.
-    .WithArgs("-c", "wal_level=logical")
+    // While the search database is unreachable, this server keeps the changes
+    // search hasn't confirmed yet. Past 1 GB it stops waiting: the replication
+    // slot is invalidated, and search needs a full resync of Registry's tables.
+    .WithArgs("-c", "wal_level=logical", "-c", "max_slot_wal_keep_size=1GB")
     .WithPgAdmin();
 var registryDatabase = registryServer.AddDatabase("registry");
 
