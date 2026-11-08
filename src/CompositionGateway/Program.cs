@@ -1,5 +1,6 @@
 using CompositionGateway;
 using Registry.Search;
+using Sales.Search;
 using Search;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 // composition handlers.
 builder.Services.AddHotelSearch(
     builder.Configuration.GetConnectionString("search")!,
-    RegistrySearch.Assembly);
+    RegistrySearch.Assembly,
+    SalesSearch.Assembly);
 
 var app = builder.Build();
 
