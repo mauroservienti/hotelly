@@ -28,6 +28,8 @@ var marketingApi = AddService<Projects.Marketing_Api>("marketing");
 // It reads from the search database with the read-only search role.
 builder.AddProject<Projects.CompositionGateway>("composition-gateway")
     .WithEnvironment("ConnectionStrings__search", SearchConnectionString(searchServer, "search"))
+    // Composition handlers call the services' APIs.
+    .WithReference(registryApi)
     .WaitFor(searchServer)
     .WaitFor(registryApi)
     .WaitFor(salesApi)

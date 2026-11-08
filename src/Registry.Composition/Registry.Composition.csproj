@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Search.Composition\Search.Composition.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -16,6 +16,11 @@ builder.Services.AddHotelSearch(
     ReservationsSearch.Assembly,
     MarketingSearch.Assembly);
 
+// Services' composition handlers call their APIs by name, like
+// http://registry-api: Aspire tells the gateway where they are.
+builder.Services.AddServiceDiscovery();
+builder.Services.ConfigureHttpClientDefaults(http => http.AddServiceDiscovery());
+
 // Composition handlers are found by scanning the assemblies deployed with the
 // gateway.
 builder.Services.AddViewModelComposition();
