@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Registry.Api\Registry.Api.csproj" />
     <ProjectReference Include="..\Sales.Api\Sales.Api.csproj" />
+    <ProjectReference Include="..\Reservations.Api\Reservations.Api.csproj" />
     <ProjectReference Include="..\CompositionGateway\CompositionGateway.csproj" />
   </ItemGroup>
 
