@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="Hotelly.AppHost/Hotelly.AppHost.csproj" />
   <Project Path="Hotelly.Seed/Hotelly.Seed.csproj" />
+  <Project Path="Registry.Api/Registry.Api.csproj" />
   <Project Path="Search.Tests/Search.Tests.csproj" />
   <Project Path="Search/Search.csproj" />
 </Solution>
