@@ -29,3 +29,13 @@ dotnet run --project src/Hotelly.AppHost
 ```
 
 The Aspire dashboard opens in the browser. From there, pgAdmin gives access to the databases. The PostgreSQL containers have no data volume: every run starts from scratch, and each service seeds its own data at startup.
+
+## Try it
+
+The composition gateway exposes the search at `/search`. For example, hotels in Rome with 4 or 5 stars and a pool, sorted by stars:
+
+```shell
+curl "http://localhost:5100/search?city=Rome&stars=4,5&amenities=pool&orderBy=stars:desc"
+```
+
+The response contains a page of hotel IDs, the total number of matching hotels, and the facets. `checkIn`, `checkOut`, `orderBy`, `page`, and `pageSize` are reserved; every other parameter is a filter, handled by the service that owns it.
