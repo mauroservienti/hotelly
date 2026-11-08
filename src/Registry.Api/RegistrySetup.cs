@@ -19,6 +19,10 @@ class RegistrySetup(
     {
         await CreateSchema(cancellationToken);
         await Seed(cancellationToken);
+        // The publication must exist before the subscription: CREATE SUBSCRIPTION
+        // asks the publisher which tables to replicate, and records them. Without
+        // the publication, the subscription is created with no tables, and stays
+        // that way until ALTER SUBSCRIPTION ... REFRESH PUBLICATION.
         await Publish(cancellationToken);
         await Subscribe(cancellationToken);
     }
