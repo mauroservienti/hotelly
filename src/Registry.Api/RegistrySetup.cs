@@ -1,3 +1,4 @@
+using Hotelly.Replication;
 using Hotelly.Seed;
 using Npgsql;
 using NpgsqlTypes;
@@ -19,12 +20,15 @@ class RegistrySetup(
     {
         await CreateSchema(cancellationToken);
         await Seed(cancellationToken);
-        // The publication must exist before the subscription: CREATE SUBSCRIPTION
-        // asks the publisher which tables to replicate, and records them. Without
-        // the publication, the subscription is created with no tables, and stays
-        // that way until ALTER SUBSCRIPTION ... REFRESH PUBLICATION.
-        await Publish(cancellationToken);
-        await Subscribe(cancellationToken);
+
+        // Only the columns search needs: no name, no description. The
+        // publication must exist before the subscription.
+        await SearchReplication.Publish(registry, "registry_search",
+            "registry.hotels (id, city, stars, amenities)", cancellationToken);
+        await CreateSearchSchema(cancellationToken);
+        await SearchReplication.Subscribe(search, "registry_search",
+            configuration["Replication:Publisher"]!, "registry_search", cancellationToken);
+        logger.LogInformation("Replicating Registry's hotels to the search database");
     }
 
     async Task CreateSchema(CancellationToken cancellationToken)
@@ -75,26 +79,11 @@ class RegistrySetup(
         logger.LogInformation("Seeded {Count} hotels", SeedHotels.Count);
     }
 
-    // Only the columns search needs: no name, no description.
-    async Task Publish(CancellationToken cancellationToken)
-    {
-        await using var command = registry.CreateCommand("""
-            DO $$
-            BEGIN
-                IF NOT EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'registry_search') THEN
-                    CREATE PUBLICATION registry_search FOR TABLE registry.hotels (id, city, stars, amenities);
-                END IF;
-            END
-            $$
-            """);
-        await command.ExecuteNonQueryAsync(cancellationToken);
-    }
-
     // Runs in the search database, as the registry role: Registry owns its
-    // schema there, including the tables and the subscription that fills them.
-    async Task Subscribe(CancellationToken cancellationToken)
+    // schema there. Same schema-qualified name as the published table.
+    async Task CreateSearchSchema(CancellationToken cancellationToken)
     {
-        await using (var table = search.CreateCommand("""
+        await using var command = search.CreateCommand("""
             CREATE TABLE IF NOT EXISTS registry.hotels (
                 id uuid PRIMARY KEY,
                 city text NOT NULL,
@@ -103,26 +92,8 @@ class RegistrySetup(
             );
             CREATE INDEX IF NOT EXISTS hotels_city ON registry.hotels (city);
             CREATE INDEX IF NOT EXISTS hotels_amenities ON registry.hotels USING gin (amenities);
-            """))
-        {
-            await table.ExecuteNonQueryAsync(cancellationToken);
-        }
-
-        await using (var exists = search.CreateCommand("SELECT 1 FROM pg_subscription WHERE subname = 'registry_search'"))
-        {
-            if (await exists.ExecuteScalarAsync(cancellationToken) is not null)
-            {
-                return;
-            }
-        }
-
-        // CREATE SUBSCRIPTION can't run in a transaction block, nor take
-        // parameters: the publisher connection comes from configuration.
-        var publisher = configuration["Registry:Publisher"]!.Replace("'", "''");
-        await using var subscribe = search.CreateCommand(
-            $"CREATE SUBSCRIPTION registry_search CONNECTION '{publisher}' PUBLICATION registry_search");
-        await subscribe.ExecuteNonQueryAsync(cancellationToken);
-        logger.LogInformation("Subscribed the search database to Registry's hotels");
+            """);
+        await command.ExecuteNonQueryAsync(cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

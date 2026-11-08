@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="CompositionGateway/CompositionGateway.csproj" />
   <Project Path="Hotelly.AppHost/Hotelly.AppHost.csproj" />
+  <Project Path="Hotelly.Replication/Hotelly.Replication.csproj" />
   <Project Path="Hotelly.Seed/Hotelly.Seed.csproj" />
   <Project Path="Registry.Api/Registry.Api.csproj" />
   <Project Path="Registry.Search.Tests/Registry.Search.Tests.csproj" />

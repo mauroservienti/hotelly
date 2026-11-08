@@ -13,25 +13,7 @@ var searchServer = builder.AddPostgres("search-db")
     .WithInitFiles("../../postgres")
     .WithPgAdmin();
 
-var registryServer = builder.AddPostgres("registry-db")
-    .WithImageTag("18")
-    // Logical replication publishes changes to the search database.
-    // While the search database is unreachable, this server keeps the changes
-    // search hasn't confirmed yet. Past 1 GB it stops waiting: the replication
-    // slot is invalidated, and search needs a full resync of Registry's tables.
-    .WithArgs("-c", "wal_level=logical", "-c", "max_slot_wal_keep_size=1GB")
-    .WithPgAdmin();
-var registryDatabase = registryServer.AddDatabase("registry");
-
-var registryApi = builder.AddProject<Projects.Registry_Api>("registry-api")
-    .WithReference(registryDatabase)
-    .WithEnvironment("ConnectionStrings__search", SearchConnectionString(searchServer, "registry"))
-    // The search database connects to Registry's server from its container,
-    // so it uses the container network: the resource name and the target port.
-    .WithEnvironment("Registry__Publisher", ReferenceExpression.Create(
-        $"host={registryServer.Resource.Name} port=5432 dbname=registry user=postgres password={registryServer.Resource.PasswordParameter}"))
-    .WaitFor(registryDatabase)
-    .WaitFor(searchServer);
+var registryApi = AddService<Projects.Registry_Api>("registry");
 
 // The gateway hosts the search process and the services' search providers.
 // It reads from the search database with the read-only search role.
@@ -41,6 +23,33 @@ builder.AddProject<Projects.CompositionGateway>("composition-gateway")
     .WaitFor(registryApi);
 
 builder.Build().Run();
+
+// A service with its own PostgreSQL server and database, named after the
+// service, replicating its search tables to the search database.
+IResourceBuilder<ProjectResource> AddService<TProject>(string name) where TProject : IProjectMetadata, new()
+{
+    var server = builder.AddPostgres($"{name}-db")
+        .WithImageTag("18")
+        // Logical replication publishes changes to the search database.
+        // While the search database is unreachable, this server keeps the
+        // changes search hasn't confirmed yet. Past 1 GB it stops waiting: the
+        // replication slot is invalidated, and search needs a full resync of
+        // the service's tables.
+        .WithArgs("-c", "wal_level=logical", "-c", "max_slot_wal_keep_size=1GB")
+        .WithPgAdmin();
+    var database = server.AddDatabase(name);
+
+    return builder.AddProject<TProject>($"{name}-api")
+        .WithReference(database)
+        .WithEnvironment("ConnectionStrings__search", SearchConnectionString(searchServer, name))
+        // The search database connects to the service's server from its
+        // container, so it uses the container network: the resource name and
+        // the target port.
+        .WithEnvironment("Replication__Publisher", ReferenceExpression.Create(
+            $"host={server.Resource.Name} port=5432 dbname={name} user=postgres password={server.Resource.PasswordParameter}"))
+        .WaitFor(database)
+        .WaitFor(searchServer);
+}
 
 // Each role's password matches its name: it's a demo.
 static ReferenceExpression SearchConnectionString(IResourceBuilder<PostgresServerResource> server, string role)

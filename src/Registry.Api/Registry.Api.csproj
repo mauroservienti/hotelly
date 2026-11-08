@@ -5,6 +5,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Hotelly.Replication\Hotelly.Replication.csproj" />
     <ProjectReference Include="..\Hotelly.Seed\Hotelly.Seed.csproj" />
   </ItemGroup>
 
