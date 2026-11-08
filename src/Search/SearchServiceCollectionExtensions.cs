@@ -1,6 +1,7 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Search;
 
@@ -26,6 +27,7 @@ public static class SearchServiceCollectionExtensions
             .UseNpgsql(connectionString)
             .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
         services.AddScoped<HotelSearch>();
+        services.TryAddSingleton(TimeProvider.System);
 
         var types = providerAssemblies
             .SelectMany(a => a.GetTypes())
