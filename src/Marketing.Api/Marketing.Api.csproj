@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hotelly.Replication\Hotelly.Replication.csproj" />
+    <ProjectReference Include="..\Hotelly.Seed\Hotelly.Seed.csproj" />
+  </ItemGroup>
+
+</Project>
