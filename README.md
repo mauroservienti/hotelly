@@ -38,7 +38,13 @@ The composition gateway exposes the search at `/search`. For example, hotels in 
 curl "http://localhost:5100/search?city=Rome&stars=4,5&amenities=pool&checkIn=2027-02-12&checkOut=2027-02-15&orderBy=stars:desc,rating:desc"
 ```
 
-The response contains a page of hotel IDs, the total number of matching hotels, and the facets. `checkIn`, `checkOut`, `orderBy`, `page`, and `pageSize` are reserved; every other parameter is a filter, handled by the service that owns it.
+The response contains a page of hotels, the total number of matching hotels, and the facets. `checkIn`, `checkOut`, `orderBy`, `page`, and `pageSize` are reserved; every other parameter is a filter, handled by the service that owns it.
+
+## Composing the results page
+
+The search only returns hotel IDs. The gateway uses [ServiceComposer](https://github.com/ServiceComposer/ServiceComposer.AspNetCore) to turn them into a results page: the search handler runs the search, then raises a `HotelsFound` event with a view model for each hotel on the page. Services subscribe to it, load what they own for the whole page with a single call to their own API, and add it to the hotels' view models. Registry, for example, adds the name, city, stars, and amenities.
+
+Services read from their own databases, not from the search database: the search database only has what search needs.
 
 ## Search providers
 
