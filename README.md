@@ -11,7 +11,9 @@ Hotelly is made of the following services:
 
 ## Searching, paging, and sorting
 
-The first scenario Hotelly demos is a hotel search page: filtering, faceting, sorting, and paging data owned by different services. Search uses a dedicated PostgreSQL database, with one schema per service. Each service has a database role that can write only to its own schema, and the search process has a role that can only read. The search results page is then composed using [ServiceComposer](https://github.com/ServiceComposer/ServiceComposer.AspNetCore).
+The first scenario Hotelly demos is a hotel search page: filtering, faceting, sorting, and paging data owned by different services. Each service owns its PostgreSQL server. Search has its own server too, with one schema per service. Each service has a database role that can write only to its own schema, and the search process has a role that can only read.
+
+Services keep their search tables up to date with PostgreSQL logical replication: each service publishes only the columns search needs, and subscribes its schema in the search database to that publication. There's no sync code, and changes arrive in commit order. The search results page is then composed using [ServiceComposer](https://github.com/ServiceComposer/ServiceComposer.AspNetCore).
 
 ## Requirements
 
@@ -26,4 +28,4 @@ Hotelly uses Aspire to start everything it needs:
 dotnet run --project src/Hotelly.AppHost
 ```
 
-The Aspire dashboard opens in the browser. From there, pgAdmin gives access to the search database. The PostgreSQL container has no data volume: every run starts from scratch.
+The Aspire dashboard opens in the browser. From there, pgAdmin gives access to the databases. The PostgreSQL containers have no data volume: every run starts from scratch, and each service seeds its own data at startup.
