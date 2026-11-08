@@ -7,6 +7,7 @@
   <Project Path="Registry.Search.Tests/Registry.Search.Tests.csproj" />
   <Project Path="Registry.Search/Registry.Search.csproj" />
   <Project Path="Reservations.Api/Reservations.Api.csproj" />
+  <Project Path="Reservations.Search.Tests/Reservations.Search.Tests.csproj" />
   <Project Path="Reservations.Search/Reservations.Search.csproj" />
   <Project Path="Sales.Api/Sales.Api.csproj" />
   <Project Path="Sales.Search.Tests/Sales.Search.Tests.csproj" />
