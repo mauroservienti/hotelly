@@ -17,6 +17,21 @@ CREATE SCHEMA reservations AUTHORIZATION reservations;
 CREATE SCHEMA marketing AUTHORIZATION marketing;
 CREATE SCHEMA sales AUTHORIZATION sales;
 
+-- Each service subscribes to its own publication, to replicate what search
+-- needs into its schema. Creating a subscription requires CREATE on the
+-- database and the pg_create_subscription role (PostgreSQL 16 and later).
+DO $$
+DECLARE
+    owner text;
+BEGIN
+    FOREACH owner IN ARRAY ARRAY['registry', 'reservations', 'marketing', 'sales']
+    LOOP
+        EXECUTE format('GRANT CREATE ON DATABASE search TO %I', owner);
+        EXECUTE format('GRANT pg_create_subscription TO %I', owner);
+    END LOOP;
+END
+$$;
+
 -- Search reads everything, including tables services create later.
 DO $$
 DECLARE
