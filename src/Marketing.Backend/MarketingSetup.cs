@@ -19,6 +19,7 @@ class MarketingSetup(
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         await CreateSchema(cancellationToken);
+        await GrantCompositionAccess(cancellationToken);
         await Seed(cancellationToken);
 
         // Search needs ratings, not what reviewers wrote: the comments stay
@@ -47,6 +48,25 @@ class MarketingSetup(
                 reviewed_on date NOT NULL
             );
             CREATE INDEX IF NOT EXISTS reviews_hotel_id ON marketing.reviews (hotel_id)
+            """);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    // Marketing's composition handlers run in the composition gateway, and
+    // read ratings straight from this database: they're part of Marketing,
+    // deployed somewhere else. They get a role that can only read.
+    async Task GrantCompositionAccess(CancellationToken cancellationToken)
+    {
+        await using var command = marketing.CreateCommand("""
+            DO $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'marketing_composition') THEN
+                    CREATE ROLE marketing_composition LOGIN PASSWORD 'marketing_composition';
+                END IF;
+            END
+            $$;
+            GRANT USAGE ON SCHEMA marketing TO marketing_composition;
+            GRANT SELECT ON marketing.reviews TO marketing_composition;
             """);
         await command.ExecuteNonQueryAsync(cancellationToken);
     }

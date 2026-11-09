@@ -19,6 +19,7 @@ class SalesSetup(
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         await CreateSchema(cancellationToken);
+        await GrantCompositionAccess(cancellationToken);
         await Seed(cancellationToken);
 
         // The publication must exist before the subscription.
@@ -41,6 +42,25 @@ class SalesSetup(
                 rate numeric(10, 2) NOT NULL,
                 PRIMARY KEY (hotel_id, night)
             )
+            """);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    // Sales' composition handlers run in the composition gateway, and read
+    // prices straight from this database: they're part of Sales, deployed
+    // somewhere else. They get a role that can only read.
+    async Task GrantCompositionAccess(CancellationToken cancellationToken)
+    {
+        await using var command = sales.CreateCommand("""
+            DO $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'sales_composition') THEN
+                    CREATE ROLE sales_composition LOGIN PASSWORD 'sales_composition';
+                END IF;
+            END
+            $$;
+            GRANT USAGE ON SCHEMA sales TO sales_composition;
+            GRANT SELECT ON sales.nightly_rates TO sales_composition;
             """);
         await command.ExecuteNonQueryAsync(cancellationToken);
     }

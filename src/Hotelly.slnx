@@ -4,6 +4,7 @@
   <Project Path="Hotelly.Replication/Hotelly.Replication.csproj" />
   <Project Path="Hotelly.Seed/Hotelly.Seed.csproj" />
   <Project Path="Marketing.Backend/Marketing.Backend.csproj" />
+  <Project Path="Marketing.Composition/Marketing.Composition.csproj" />
   <Project Path="Marketing.Search.Tests/Marketing.Search.Tests.csproj" />
   <Project Path="Marketing.Search/Marketing.Search.csproj" />
   <Project Path="Registry.Backend/Registry.Backend.csproj" />
@@ -14,6 +15,7 @@
   <Project Path="Reservations.Search.Tests/Reservations.Search.Tests.csproj" />
   <Project Path="Reservations.Search/Reservations.Search.csproj" />
   <Project Path="Sales.Backend/Sales.Backend.csproj" />
+  <Project Path="Sales.Composition/Sales.Composition.csproj" />
   <Project Path="Sales.Search.Tests/Sales.Search.Tests.csproj" />
   <Project Path="Sales.Search/Sales.Search.csproj" />
   <Project Path="Search.Composition/Search.Composition.csproj" />
