@@ -1,7 +1,7 @@
 using Npgsql;
-using Reservations.Api;
+using Reservations.Backend;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.AddKeyedSingleton("reservations", (_, _) =>
     NpgsqlDataSource.Create(builder.Configuration.GetConnectionString("reservations")!));
@@ -10,6 +10,4 @@ builder.Services.AddKeyedSingleton("search", (_, _) =>
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddHostedService<ReservationsSetup>();
 
-var app = builder.Build();
-
-app.Run();
+builder.Build().Run();

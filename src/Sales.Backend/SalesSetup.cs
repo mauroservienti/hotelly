@@ -2,7 +2,7 @@ using Hotelly.Replication;
 using Npgsql;
 using NpgsqlTypes;
 
-namespace Sales.Api;
+namespace Sales.Backend;
 
 /// <summary>
 /// Sets up Sales' data at startup: its own database, the seed data, and the

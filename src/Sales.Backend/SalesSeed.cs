@@ -1,6 +1,6 @@
 using Hotelly.Seed;
 
-namespace Sales.Api;
+namespace Sales.Backend;
 
 record SeedRate(Guid HotelId, DateOnly Night, decimal Rate);
 

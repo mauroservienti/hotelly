@@ -1,6 +1,6 @@
 using Hotelly.Seed;
 
-namespace Registry.Api;
+namespace Registry.Backend;
 
 record SeedHotel(Guid Id, string Name, string City, int Stars, string[] Amenities, string Description);
 

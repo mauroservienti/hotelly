@@ -1,6 +1,6 @@
 using Hotelly.Seed;
 
-namespace Marketing.Api;
+namespace Marketing.Backend;
 
 record SeedReview(Guid Id, Guid HotelId, short Rating, string Comment, DateOnly ReviewedOn);
 

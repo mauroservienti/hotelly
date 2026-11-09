@@ -3,7 +3,7 @@ using Hotelly.Seed;
 using Npgsql;
 using NpgsqlTypes;
 
-namespace Registry.Api;
+namespace Registry.Backend;
 
 /// <summary>
 /// Sets up Registry's data at startup: its own database, the seed data, and

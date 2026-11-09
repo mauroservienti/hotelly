@@ -2,7 +2,7 @@ using Hotelly.Replication;
 using Npgsql;
 using NpgsqlTypes;
 
-namespace Marketing.Api;
+namespace Marketing.Backend;
 
 /// <summary>
 /// Sets up Marketing's data at startup: its own database, the seed data, and

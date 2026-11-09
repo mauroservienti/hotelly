@@ -12,10 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Registry.Api\Registry.Api.csproj" />
-    <ProjectReference Include="..\Sales.Api\Sales.Api.csproj" />
-    <ProjectReference Include="..\Reservations.Api\Reservations.Api.csproj" />
-    <ProjectReference Include="..\Marketing.Api\Marketing.Api.csproj" />
+    <ProjectReference Include="..\Registry.Backend\Registry.Backend.csproj" />
+    <ProjectReference Include="..\Sales.Backend\Sales.Backend.csproj" />
+    <ProjectReference Include="..\Reservations.Backend\Reservations.Backend.csproj" />
+    <ProjectReference Include="..\Marketing.Backend\Marketing.Backend.csproj" />
     <ProjectReference Include="..\CompositionGateway\CompositionGateway.csproj" />
   </ItemGroup>
 
