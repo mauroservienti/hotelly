@@ -19,28 +19,29 @@ var searchServer = builder.AddPostgres("search-db")
     .WithArgs("-c", "max_logical_replication_workers=16", "-c", "max_worker_processes=24")
     .WithPgAdmin();
 
-var registryApi = AddService<Projects.Registry_Api>("registry");
-var salesApi = AddService<Projects.Sales_Api>("sales");
-var reservationsApi = AddService<Projects.Reservations_Api>("reservations");
-var marketingApi = AddService<Projects.Marketing_Api>("marketing");
+var registry = AddService<Projects.Registry_Api>("registry");
+var sales = AddService<Projects.Sales_Api>("sales");
+var reservations = AddService<Projects.Reservations_Api>("reservations");
+var marketing = AddService<Projects.Marketing_Api>("marketing");
 
-// The gateway hosts the search process and the services' search providers.
-// It reads from the search database with the read-only search role.
+// The gateway hosts the search process, and the services' search providers
+// and composition handlers. It reads from the search database with the
+// read-only search role. Composition handlers belong to their services, and
+// read from their services' databases with a read-only role.
 builder.AddProject<Projects.CompositionGateway>("composition-gateway")
-    .WithEnvironment("ConnectionStrings__search", SearchConnectionString(searchServer, "search"))
-    // Composition handlers call the services' APIs.
-    .WithReference(registryApi)
+    .WithEnvironment("ConnectionStrings__search", ConnectionString(searchServer, "search", "search"))
+    .WithEnvironment("ConnectionStrings__registry", registry.CompositionConnectionString)
     .WaitFor(searchServer)
-    .WaitFor(registryApi)
-    .WaitFor(salesApi)
-    .WaitFor(reservationsApi)
-    .WaitFor(marketingApi);
+    .WaitFor(registry.Api)
+    .WaitFor(sales.Api)
+    .WaitFor(reservations.Api)
+    .WaitFor(marketing.Api);
 
 builder.Build().Run();
 
 // A service with its own PostgreSQL server and database, named after the
 // service, replicating its search tables to the search database.
-IResourceBuilder<ProjectResource> AddService<TProject>(string name) where TProject : IProjectMetadata, new()
+Service AddService<TProject>(string name) where TProject : IProjectMetadata, new()
 {
     var server = builder.AddPostgres($"{name}-db")
         .WithImageTag("18")
@@ -53,9 +54,9 @@ IResourceBuilder<ProjectResource> AddService<TProject>(string name) where TProje
         .WithPgAdmin();
     var database = server.AddDatabase(name);
 
-    return builder.AddProject<TProject>($"{name}-api")
+    var api = builder.AddProject<TProject>($"{name}-api")
         .WithReference(database)
-        .WithEnvironment("ConnectionStrings__search", SearchConnectionString(searchServer, name))
+        .WithEnvironment("ConnectionStrings__search", ConnectionString(searchServer, "search", name))
         // The search database connects to the service's server from its
         // container, so it uses the container network: the resource name and
         // the target port.
@@ -63,12 +64,17 @@ IResourceBuilder<ProjectResource> AddService<TProject>(string name) where TProje
             $"host={server.Resource.Name} port=5432 dbname={name} user=postgres password={server.Resource.PasswordParameter}"))
         .WaitFor(database)
         .WaitFor(searchServer);
+
+    // The service creates the read-only role its composition handlers use.
+    return new Service(api, ConnectionString(server, name, $"{name}_composition"));
 }
 
 // Each role's password matches its name: it's a demo.
-static ReferenceExpression SearchConnectionString(IResourceBuilder<PostgresServerResource> server, string role)
+static ReferenceExpression ConnectionString(IResourceBuilder<PostgresServerResource> server, string database, string role)
 {
     var endpoint = server.Resource.PrimaryEndpoint;
     return ReferenceExpression.Create(
-        $"Host={endpoint.Property(EndpointProperty.Host)};Port={endpoint.Property(EndpointProperty.Port)};Database=search;Username={role};Password={role}");
+        $"Host={endpoint.Property(EndpointProperty.Host)};Port={endpoint.Property(EndpointProperty.Port)};Database={database};Username={role};Password={role}");
 }
+
+record Service(IResourceBuilder<ProjectResource> Api, ReferenceExpression CompositionConnectionString);

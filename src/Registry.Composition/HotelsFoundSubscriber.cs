@@ -1,5 +1,6 @@
-using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Search.Composition;
 using ServiceComposer.AspNetCore;
 
@@ -7,27 +8,26 @@ namespace Registry.Composition;
 
 /// <summary>
 /// Adds Registry's hotel details to the search results: name, city, stars,
-/// and amenities. One call to Registry for the whole page.
+/// and amenities. One query to Registry's database for the whole page.
 /// </summary>
-class HotelsFoundSubscriber(IHttpClientFactory httpClientFactory) : ICompositionEventsSubscriber
+class HotelsFoundSubscriber([FromKeyedServices(RegistryComposition.DataSourceKey)] NpgsqlDataSource registry) : ICompositionEventsSubscriber
 {
     [HttpGet("/search")]
     public void Subscribe(ICompositionEventsPublisher publisher) =>
         publisher.Subscribe<HotelsFound>(async (@event, request) =>
         {
-            var ids = string.Join("&", @event.Hotels.Keys.Select(id => $"ids={id}"));
-            var details = await httpClientFactory.CreateClient(RegistryComposition.HttpClientName)
-                .GetFromJsonAsync<HotelDetails[]>($"/hotels?{ids}", request.HttpContext.RequestAborted);
+            await using var command = registry.CreateCommand(
+                "SELECT id, name, city, stars, amenities FROM registry.hotels WHERE id = ANY($1)");
+            command.Parameters.AddWithValue(@event.Hotels.Keys.ToArray());
 
-            foreach (var hotel in details!)
+            await using var reader = await command.ExecuteReaderAsync(request.HttpContext.RequestAborted);
+            while (await reader.ReadAsync(request.HttpContext.RequestAborted))
             {
-                var vm = @event.Hotels[hotel.Id];
-                vm.Name = hotel.Name;
-                vm.City = hotel.City;
-                vm.Stars = hotel.Stars;
-                vm.Amenities = hotel.Amenities;
+                var vm = @event.Hotels[reader.GetGuid(0)];
+                vm.Name = reader.GetString(1);
+                vm.City = reader.GetString(2);
+                vm.Stars = reader.GetInt32(3);
+                vm.Amenities = reader.GetFieldValue<string[]>(4);
             }
         });
-
-    record HotelDetails(Guid Id, string Name, string City, int Stars, string[] Amenities);
 }
