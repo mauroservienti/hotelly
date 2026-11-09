@@ -2,7 +2,7 @@ using Hotelly.Replication;
 using Npgsql;
 using NpgsqlTypes;
 
-namespace Reservations.Api;
+namespace Reservations.Backend;
 
 /// <summary>
 /// Sets up Reservations' data at startup: its own database, the seed data,

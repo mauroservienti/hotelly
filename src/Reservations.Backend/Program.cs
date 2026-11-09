@@ -1,5 +1,5 @@
 using Npgsql;
-using Reservations.Api;
+using Reservations.Backend;
 
 var builder = WebApplication.CreateBuilder(args);
 

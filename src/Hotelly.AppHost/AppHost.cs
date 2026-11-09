@@ -19,10 +19,10 @@ var searchServer = builder.AddPostgres("search-db")
     .WithArgs("-c", "max_logical_replication_workers=16", "-c", "max_worker_processes=24")
     .WithPgAdmin();
 
-var registry = AddService<Projects.Registry_Api>("registry");
-var sales = AddService<Projects.Sales_Api>("sales");
-var reservations = AddService<Projects.Reservations_Api>("reservations");
-var marketing = AddService<Projects.Marketing_Api>("marketing");
+var registry = AddService<Projects.Registry_Backend>("registry");
+var sales = AddService<Projects.Sales_Backend>("sales");
+var reservations = AddService<Projects.Reservations_Backend>("reservations");
+var marketing = AddService<Projects.Marketing_Backend>("marketing");
 
 // The gateway hosts the search process, and the services' search providers
 // and composition handlers. It reads from the search database with the
@@ -32,10 +32,10 @@ builder.AddProject<Projects.CompositionGateway>("composition-gateway")
     .WithEnvironment("ConnectionStrings__search", ConnectionString(searchServer, "search", "search"))
     .WithEnvironment("ConnectionStrings__registry", registry.CompositionConnectionString)
     .WaitFor(searchServer)
-    .WaitFor(registry.Api)
-    .WaitFor(sales.Api)
-    .WaitFor(reservations.Api)
-    .WaitFor(marketing.Api);
+    .WaitFor(registry.Backend)
+    .WaitFor(sales.Backend)
+    .WaitFor(reservations.Backend)
+    .WaitFor(marketing.Backend);
 
 builder.Build().Run();
 
@@ -54,7 +54,7 @@ Service AddService<TProject>(string name) where TProject : IProjectMetadata, new
         .WithPgAdmin();
     var database = server.AddDatabase(name);
 
-    var api = builder.AddProject<TProject>($"{name}-api")
+    var backend = builder.AddProject<TProject>($"{name}-backend")
         .WithReference(database)
         .WithEnvironment("ConnectionStrings__search", ConnectionString(searchServer, "search", name))
         // The search database connects to the service's server from its
@@ -66,7 +66,7 @@ Service AddService<TProject>(string name) where TProject : IProjectMetadata, new
         .WaitFor(searchServer);
 
     // The service creates the read-only role its composition handlers use.
-    return new Service(api, ConnectionString(server, name, $"{name}_composition"));
+    return new Service(backend, ConnectionString(server, name, $"{name}_composition"));
 }
 
 // Each role's password matches its name: it's a demo.
@@ -77,4 +77,4 @@ static ReferenceExpression ConnectionString(IResourceBuilder<PostgresServerResou
         $"Host={endpoint.Property(EndpointProperty.Host)};Port={endpoint.Property(EndpointProperty.Port)};Database={database};Username={role};Password={role}");
 }
 
-record Service(IResourceBuilder<ProjectResource> Api, ReferenceExpression CompositionConnectionString);
+record Service(IResourceBuilder<ProjectResource> Backend, ReferenceExpression CompositionConnectionString);

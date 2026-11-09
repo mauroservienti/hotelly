@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Hotelly.Seed;
 
-namespace Reservations.Api;
+namespace Reservations.Backend;
 
 record SeedNight(Guid HotelId, DateOnly Night, int Rooms, int Booked);
 

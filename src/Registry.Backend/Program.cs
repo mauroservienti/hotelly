@@ -1,5 +1,5 @@
 using Npgsql;
-using Registry.Api;
+using Registry.Backend;
 
 var builder = WebApplication.CreateBuilder(args);
 
