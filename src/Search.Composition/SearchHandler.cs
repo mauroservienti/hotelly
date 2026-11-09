@@ -26,9 +26,13 @@ class SearchHandler(HotelSearch search) : ICompositionRequestsHandler
             return hotel;
         }).ToList();
 
-        await request.GetCompositionContext().RaiseEvent(new HotelsFound(
-            searchRequest,
-            hotels.ToDictionary(h => (Guid)h.Id, h => h)));
+        // Nothing to compose for an empty page.
+        if (hotels.Count > 0)
+        {
+            await request.GetCompositionContext().RaiseEvent(new HotelsFound(
+                searchRequest,
+                hotels.ToDictionary(h => (Guid)h.Id, h => h)));
+        }
 
         var vm = request.GetComposedResponseModel();
         vm.Hotels = hotels;

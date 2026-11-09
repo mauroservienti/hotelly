@@ -15,11 +15,6 @@ class HotelsFoundSubscriber(IHttpClientFactory httpClientFactory) : IComposition
     public void Subscribe(ICompositionEventsPublisher publisher) =>
         publisher.Subscribe<HotelsFound>(async (@event, request) =>
         {
-            if (@event.Hotels.Count == 0)
-            {
-                return;
-            }
-
             var ids = string.Join("&", @event.Hotels.Keys.Select(id => $"ids={id}"));
             var details = await httpClientFactory.CreateClient(RegistryComposition.HttpClientName)
                 .GetFromJsonAsync<HotelDetails[]>($"/hotels?{ids}", request.HttpContext.RequestAborted);
