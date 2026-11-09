@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using Hotelly.Seed;
 
 namespace Reservations.Api;
@@ -11,7 +13,8 @@ static class ReservationsSeed
     /// <summary>
     /// A year of room availability for every hotel, from the first day of the
     /// current month. Busier in high season and on weekends, with some nights
-    /// sold out. Every run seeds the same data.
+    /// sold out. A night's availability is the same at every run, whatever the
+    /// day the demo runs.
     /// </summary>
     public static IEnumerable<SeedNight> Availability(DateOnly today)
     {
@@ -28,11 +31,21 @@ static class ReservationsSeed
                 var night = start.AddDays(day);
                 var occupancy = Season(night)
                     + (IsWeekend(night) ? 0.1 : 0)
-                    + (random.NextDouble() - 0.5) * 0.7;
+                    + (Noise(number, night) - 0.5) * 0.7;
                 var booked = Math.Clamp((int)Math.Round(rooms * occupancy), 0, rooms);
                 yield return new SeedNight(id, night, rooms, booked);
             }
         }
+    }
+
+    // Derived from the hotel and the night, not from the position in the
+    // sequence: a night is sold out or not whatever the month the demo runs.
+    // Hashed, like hotel IDs: seeding Random with consecutive values gives
+    // correlated first values.
+    static double Noise(int number, DateOnly night)
+    {
+        var hash = MD5.HashData(Encoding.UTF8.GetBytes($"hotelly-night-{number}-{night.DayNumber}"));
+        return BitConverter.ToUInt32(hash) / (double)uint.MaxValue;
     }
 
     // Reservations' own idea of the seasons: the expected occupancy.
