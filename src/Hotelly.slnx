@@ -14,6 +14,7 @@
   <Project Path="Reservations.Search.Tests/Reservations.Search.Tests.csproj" />
   <Project Path="Reservations.Search/Reservations.Search.csproj" />
   <Project Path="Sales.Backend/Sales.Backend.csproj" />
+  <Project Path="Sales.Composition/Sales.Composition.csproj" />
   <Project Path="Sales.Search.Tests/Sales.Search.Tests.csproj" />
   <Project Path="Sales.Search/Sales.Search.csproj" />
   <Project Path="Search.Composition/Search.Composition.csproj" />

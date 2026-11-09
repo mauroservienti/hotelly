@@ -31,6 +31,7 @@ var marketing = AddService<Projects.Marketing_Backend>("marketing");
 builder.AddProject<Projects.CompositionGateway>("composition-gateway")
     .WithEnvironment("ConnectionStrings__search", ConnectionString(searchServer, "search", "search"))
     .WithEnvironment("ConnectionStrings__registry", registry.CompositionConnectionString)
+    .WithEnvironment("ConnectionStrings__sales", sales.CompositionConnectionString)
     .WaitFor(searchServer)
     .WaitFor(registry.Backend)
     .WaitFor(sales.Backend)
