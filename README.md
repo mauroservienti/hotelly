@@ -38,7 +38,13 @@ The composition gateway exposes the search at `/search`. For example, hotels in 
 curl "http://localhost:5100/search?city=Rome&stars=4,5&amenities=pool&checkIn=2027-02-12&checkOut=2027-02-15&orderBy=stars:desc,rating:desc"
 ```
 
-The response contains a page of hotel IDs, the total number of matching hotels, and the facets. `checkIn`, `checkOut`, `orderBy`, `page`, and `pageSize` are reserved; every other parameter is a filter, handled by the service that owns it.
+The response contains a page of hotels, the total number of matching hotels, and the facets. `checkIn`, `checkOut`, `orderBy`, `page`, and `pageSize` are reserved; every other parameter is a filter, handled by the service that owns it.
+
+## Composing the results page
+
+The search only returns hotel IDs. The gateway uses [ServiceComposer](https://github.com/ServiceComposer/ServiceComposer.AspNetCore) to turn them into a results page: the search handler runs the search, then raises a `HotelsFound` event with a view model for each hotel on the page. Services subscribe to it, load what they own for the whole page with a single query, and add it to the hotels' view models. Registry, for example, adds the name, city, stars, and amenities.
+
+Composition handlers are part of their services, deployed in the gateway, like search providers. They read straight from their service's own database, not from the search database, which only has what search needs. Each service creates a role for its composition handlers that can only read. Calling the service's API would work too, at the cost of an endpoint that exists only for composition, and a network hop. Reading the database directly makes the database schema a contract between two parts of the same service, deployed separately: a schema change means deploying the composition handlers too.
 
 ## Search providers
 

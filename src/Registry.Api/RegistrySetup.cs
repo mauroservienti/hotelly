@@ -19,6 +19,7 @@ class RegistrySetup(
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         await CreateSchema(cancellationToken);
+        await GrantCompositionAccess(cancellationToken);
         await Seed(cancellationToken);
 
         // Only the columns search needs: no name, no description. The
@@ -45,6 +46,25 @@ class RegistrySetup(
                 amenities text[] NOT NULL,
                 description text NOT NULL
             )
+            """);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    // Registry's composition handlers run in the composition gateway, and
+    // read hotel details straight from this database: they're part of
+    // Registry, deployed somewhere else. They get a role that can only read.
+    async Task GrantCompositionAccess(CancellationToken cancellationToken)
+    {
+        await using var command = registry.CreateCommand("""
+            DO $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'registry_composition') THEN
+                    CREATE ROLE registry_composition LOGIN PASSWORD 'registry_composition';
+                END IF;
+            END
+            $$;
+            GRANT USAGE ON SCHEMA registry TO registry_composition;
+            GRANT SELECT ON registry.hotels TO registry_composition;
             """);
         await command.ExecuteNonQueryAsync(cancellationToken);
     }
