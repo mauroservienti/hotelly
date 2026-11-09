@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hotelly search</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body class="show-owners">
+  <header class="top">
+    <div class="brand">
+      <h1>Hotelly</h1>
+      <p>Searching, filtering, sorting, and paging data owned by different services.</p>
+    </div>
+    <div class="top-actions">
+      <label class="switch" title="Color each filter and each piece of data by the service that owns it">
+        <input type="checkbox" id="show-owners" checked> Show who owns what
+      </label>
+      <button type="button" id="how-toggle" aria-expanded="false" aria-controls="how">How it works</button>
+    </div>
+  </header>
+
+  <section id="how" class="how" hidden>
+    <h2>How it works</h2>
+    <ol>
+      <li><strong>Each service owns its data.</strong> Registry owns the hotels, Sales the nightly rates, Reservations the availability, and Marketing the reviews. Each one has its own database.</li>
+      <li><strong>Search data meets in one place.</strong> Each service replicates only the columns search needs to its own schema in the search database, using PostgreSQL logical replication. No service can write to another one's schema.</li>
+      <li><strong>The search runs in the gateway.</strong> When you change a filter, this page calls the composition gateway: <code id="how-request">GET /search</code>. The search process starts from Registry's hotels, and each service's providers add their part to the same query: filters narrow it, facets count the filtered hotels, sorts order them. The search database runs it, and only a page of hotel IDs comes back.</li>
+      <li><strong>Services compose the results page.</strong> The gateway raises a <code>HotelsFound</code> event with the page of IDs. Registry, Sales, and Marketing each load what they own for the whole page, with one query to their own database, and add it to the results.</li>
+      <li><strong>Look under the hood.</strong> The request and the composed response are at the bottom of the results. The colors tell you which service owns each filter and each piece of data: hover the <span class="tip-icon" aria-hidden="true">i</span> icons for details.</li>
+    </ol>
+    <ul class="legend">
+      <li data-owner="registry"><strong>Registry</strong> hotels, cities, stars, amenities</li>
+      <li data-owner="reservations"><strong>Reservations</strong> availability</li>
+      <li data-owner="sales"><strong>Sales</strong> prices</li>
+      <li data-owner="marketing"><strong>Marketing</strong> ratings and reviews</li>
+      <li data-owner="search"><strong>Search</strong> the process: paging, the query, no business rules</li>
+    </ul>
+  </section>
+
+  <main class="layout">
+    <aside class="filters" aria-label="Filters">
+      <fieldset class="group" data-owner="reservations sales">
+        <legend>
+          Stay
+          <span class="tip" tabindex="0">
+            <span class="tip-icon" aria-hidden="true">i</span>
+            <span class="tip-body" role="tooltip">
+              Two services use the dates. <b>Reservations</b> removes hotels with a sold-out night in the stay. <b>Sales</b> removes hotels it can't price for every night, then prices the stay: the sum of the nightly rates, which change with the season.
+              Without dates, prices are "from" prices: the lowest nightly rate in the next 30 days.
+              <span id="seed-window"></span>
+            </span>
+          </span>
+        </legend>
+        <div class="dates">
+          <label>Check-in <input type="date" id="check-in"></label>
+          <label>Check-out <input type="date" id="check-out"></label>
+        </div>
+        <button type="button" class="link" id="clear-dates">Clear dates</button>
+      </fieldset>
+
+      <fieldset class="group" data-owner="registry">
+        <legend>
+          City
+          <span class="tip" tabindex="0">
+            <span class="tip-icon" aria-hidden="true">i</span>
+            <span class="tip-body" role="tooltip">
+              <b>Registry</b> owns this filter and its facet. Counts are how many hotels match all the current filters, this one included.
+            </span>
+          </span>
+        </legend>
+        <select id="city"><option value="">Any city</option></select>
+      </fieldset>
+
+      <fieldset class="group" data-owner="registry">
+        <legend>
+          Stars
+          <span class="tip" tabindex="0">
+            <span class="tip-icon" aria-hidden="true">i</span>
+            <span class="tip-body" role="tooltip">
+              <b>Registry</b>: hotels with any of the selected stars. The counts come from Registry's facet, built over the filtered hotels, including the stars filter itself: that's why the other values drop to 0 once you select one.
+              Real sites build each facet without its own filter. The demo doesn't: filters don't declare which parameter they handle, so the search process can't leave one out.
+            </span>
+          </span>
+        </legend>
+        <div id="stars" class="options"></div>
+      </fieldset>
+
+      <fieldset class="group" data-owner="registry">
+        <legend>
+          Amenities
+          <span class="tip" tabindex="0">
+            <span class="tip-icon" aria-hidden="true">i</span>
+            <span class="tip-body" role="tooltip">
+              <b>Registry</b>: hotels with all the selected amenities. Each count is how many of the current results have that amenity.
+            </span>
+          </span>
+        </legend>
+        <div id="amenities" class="options"></div>
+      </fieldset>
+
+      <fieldset class="group" data-owner="marketing">
+        <legend>
+          Guest rating
+          <span class="tip" tabindex="0">
+            <span class="tip-icon" aria-hidden="true">i</span>
+            <span class="tip-body" role="tooltip">
+              <b>Marketing</b> owns this filter and facet: the average rating of each hotel's reviews, from 1 to 5. The bands overlap: a hotel rated 4.5 counts in all of them. Hotels without reviews never match.
+            </span>
+          </span>
+        </legend>
+        <div id="rating" class="options"></div>
+      </fieldset>
+    </aside>
+
+    <section class="results" aria-label="Results">
+      <div class="toolbar">
+        <p id="summary" class="summary" aria-live="polite">Searching…</p>
+        <div class="sorts" data-owner="search">
+          <label>Sort by <select id="sort"></select></label>
+          <label>then by <select id="then-by"></select></label>
+          <span class="tip tip-left" tabindex="0">
+            <span class="tip-icon" aria-hidden="true">i</span>
+            <span class="tip-body" role="tooltip">
+              Each sort key belongs to a service: stars to <b>Registry</b>, price to <b>Sales</b>, rating to <b>Marketing</b>. In the order you pick, the search process asks each one to add an <code>OrderBy</code> or a <code>ThenBy</code> to the same query, so sorting by price, then by rating, runs in the database.
+              Hotels without a value, like no reviews or no price, come last in both directions. The hotel ID breaks ties, so pages never overlap.
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <p id="error" class="error" hidden></p>
+      <ol id="hotels" class="hotels"></ol>
+
+      <nav class="pager" aria-label="Pages">
+        <button type="button" id="prev">Previous</button>
+        <span id="page-info"></span>
+        <button type="button" id="next">Next</button>
+      </nav>
+
+      <details class="hood">
+        <summary>Under the hood: the request and the composed response</summary>
+        <p>
+          The search returned only the page of hotel IDs, the total count, and the facets. Everything else on each hotel was added by its owning service, in a <code>HotelsFound</code> composition handler running in the gateway.
+        </p>
+        <p><code id="request-line"></code> <span id="timing" class="muted"></span></p>
+        <pre id="response"></pre>
+      </details>
+    </section>
+  </main>
+
+  <template id="hotel-template">
+    <li class="hotel">
+      <div class="hotel-main" data-owner="registry">
+        <h3><span class="name"></span> <span class="stars" role="img"></span></h3>
+        <p class="city"></p>
+        <ul class="amenities"></ul>
+      </div>
+      <div class="hotel-side">
+        <p class="rating" data-owner="marketing"></p>
+        <p class="price" data-owner="sales"></p>
+      </div>
+    </li>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

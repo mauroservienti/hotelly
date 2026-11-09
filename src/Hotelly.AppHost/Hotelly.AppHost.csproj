@@ -17,6 +17,7 @@
     <ProjectReference Include="..\Reservations.Backend\Reservations.Backend.csproj" />
     <ProjectReference Include="..\Marketing.Backend\Marketing.Backend.csproj" />
     <ProjectReference Include="..\CompositionGateway\CompositionGateway.csproj" />
+    <ProjectReference Include="..\Website\Website.csproj" />
   </ItemGroup>
 
 </Project>
