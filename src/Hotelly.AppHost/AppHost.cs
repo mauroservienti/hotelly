@@ -28,7 +28,7 @@ var marketing = AddService<Projects.Marketing_Backend>("marketing");
 // and composition handlers. It reads from the search database with the
 // read-only search role. Composition handlers belong to their services, and
 // read from their services' databases with a read-only role.
-builder.AddProject<Projects.CompositionGateway>("composition-gateway")
+var gateway = builder.AddProject<Projects.CompositionGateway>("composition-gateway")
     .WithEnvironment("ConnectionStrings__search", ConnectionString(searchServer, "search", "search"))
     .WithEnvironment("ConnectionStrings__registry", registry.CompositionConnectionString)
     .WithEnvironment("ConnectionStrings__sales", sales.CompositionConnectionString)
@@ -38,6 +38,11 @@ builder.AddProject<Projects.CompositionGateway>("composition-gateway")
     .WaitFor(sales.Backend)
     .WaitFor(reservations.Backend)
     .WaitFor(marketing.Backend);
+
+// A website to try the search: it calls the gateway, like any frontend.
+builder.AddProject<Projects.Website>("website")
+    .WithReference(gateway)
+    .WaitFor(gateway);
 
 builder.Build().Run();
 

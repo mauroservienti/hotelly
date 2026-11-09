@@ -21,4 +21,5 @@
   <Project Path="Search.Composition/Search.Composition.csproj" />
   <Project Path="Search.Tests/Search.Tests.csproj" />
   <Project Path="Search/Search.csproj" />
+  <Project Path="Website/Website.csproj" />
 </Solution>
