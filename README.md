@@ -28,7 +28,7 @@ Hotelly uses Aspire to start everything it needs:
 dotnet run --project src/Hotelly.AppHost
 ```
 
-The Aspire dashboard opens in the browser. From there, pgAdmin gives access to the databases. The PostgreSQL containers have no data volume: every run starts from scratch, and each service seeds its own data at startup.
+The Aspire dashboard opens in the browser. From there, pgAdmin gives access to the databases. The PostgreSQL containers have no data volume: every run starts from scratch, and each service seeds its own data at startup. Hotel IDs are derived from the hotel number, so services agree on them without talking to each other. The seed data is the same at every run: nightly rates and availability cover 12 months, starting from the first day of the current month, and a given night always has the same rate and availability. Searches with stay dates outside those 12 months find no hotels: if the dates in the examples below are in the past, use later ones.
 
 ## Try it
 
