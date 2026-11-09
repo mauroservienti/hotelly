@@ -4,6 +4,7 @@
   <Project Path="Hotelly.Replication/Hotelly.Replication.csproj" />
   <Project Path="Hotelly.Seed/Hotelly.Seed.csproj" />
   <Project Path="Marketing.Backend/Marketing.Backend.csproj" />
+  <Project Path="Marketing.Composition/Marketing.Composition.csproj" />
   <Project Path="Marketing.Search.Tests/Marketing.Search.Tests.csproj" />
   <Project Path="Marketing.Search/Marketing.Search.csproj" />
   <Project Path="Registry.Backend/Registry.Backend.csproj" />
