@@ -38,21 +38,22 @@ class HotelsFoundSubscriber(
             command.Parameters.AddWithValue(from);
             command.Parameters.AddWithValue(until);
 
-            var prices = new Dictionary<Guid, decimal>();
-            await using (var reader = await command.ExecuteReaderAsync(request.HttpContext.RequestAborted))
-            {
-                while (await reader.ReadAsync(request.HttpContext.RequestAborted))
-                {
-                    prices[reader.GetGuid(0)] = reader.GetDecimal(1);
-                }
-            }
-
             // With stay dates, the search only returns hotels with a rate for
             // every night, so they all have a price. Without, a hotel with no
             // rate in the next 30 days has none: null, not a missing property.
-            foreach (var (id, vm) in @event.Hotels)
+            foreach (var vm in @event.Hotels.Values)
             {
-                decimal? price = prices.TryGetValue(id, out var p) ? p : null;
+                SetPrice(vm, null);
+            }
+
+            await using var reader = await command.ExecuteReaderAsync(request.HttpContext.RequestAborted);
+            while (await reader.ReadAsync(request.HttpContext.RequestAborted))
+            {
+                SetPrice(@event.Hotels[reader.GetGuid(0)], reader.GetDecimal(1));
+            }
+
+            void SetPrice(dynamic vm, decimal? price)
+            {
                 if (stay is null)
                 {
                     vm.FromPrice = price;
