@@ -34,6 +34,8 @@ The Aspire dashboard opens in the browser. From there, pgAdmin gives access to t
 
 The website at <http://localhost:5080> is a search page. Filters, facets, sorts, and paging all go through the composition gateway, and colors show which service owns each filter and each piece of data. The info icons explain how each part works, "How it works" walks through a search from start to finish, and "Under the hood", below the results, shows the request to the gateway and the composed response.
 
+![The search page: hotels in Rome for a 3-night stay, sorted by rating, then by price. Registry data is blue, Marketing purple, Sales green.](docs/search-results.png)
+
 The website is a client of the gateway, like any frontend: it forwards searches to the gateway, so the page only calls its own origin.
 
 The composition gateway exposes the search at `/search`. For example, hotels in Rome with 4 or 5 stars and a pool, available from February 12 to 15, 2027, sorted by stars, then by rating:
