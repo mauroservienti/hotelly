@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hotelly.BackOffice\Hotelly.BackOffice.csproj" />
+    <ProjectReference Include="..\Registry.BackOffice\Registry.BackOffice.csproj" />
   </ItemGroup>
 
 </Project>

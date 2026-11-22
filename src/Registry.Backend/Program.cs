@@ -1,6 +1,7 @@
 using Hotelly.Messaging;
 using Npgsql;
 using Registry.Backend;
+using Registry.Messages;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -12,6 +13,6 @@ builder.Services.AddHostedService<RegistrySetup>();
 
 // Registered after the setup: hosted services start in order, so messages
 // are processed only once the database is ready.
-builder.Services.AddNServiceBusEndpoint(HotellyEndpoint.Create("Hotelly.Registry", builder.Configuration));
+builder.Services.AddNServiceBusEndpoint(HotellyEndpoint.Create(RegistryEndpoint.Name, builder.Configuration));
 
 builder.Build().Run();
