@@ -1,0 +1,5 @@
+/* Sales' panel styles, shipped with the panel. */
+.sales-rates { display: grid; grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr)); gap: 0.4rem; margin: 0 0 0.75rem; padding: 0; list-style: none; }
+.sales-rates li { display: grid; padding: 0.3rem 0.4rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.8rem; color: var(--muted); }
+.sales-rates strong { color: var(--text); font-size: 0.95rem; }
+.sales-range { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }

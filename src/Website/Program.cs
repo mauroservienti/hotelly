@@ -1,5 +1,6 @@
 using Hotelly.BackOffice;
 using Registry.BackOffice;
+using Sales.BackOffice;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddHttpClient("gateway", client =>
 // panel means referencing its library and registering its panel here.
 builder.Services.AddSingleton<IReadOnlyList<BackOfficePanel>>([
     RegistryBackOffice.Panel,
+    SalesBackOffice.Panel,
 ]);
 
 var app = builder.Build();
