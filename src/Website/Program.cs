@@ -1,4 +1,5 @@
 using Hotelly.BackOffice;
+using Marketing.BackOffice;
 using Registry.BackOffice;
 using Reservations.BackOffice;
 using Sales.BackOffice;
@@ -18,6 +19,7 @@ builder.Services.AddSingleton<IReadOnlyList<BackOfficePanel>>([
     RegistryBackOffice.Panel,
     SalesBackOffice.Panel,
     ReservationsBackOffice.Panel,
+    MarketingBackOffice.Panel,
 ]);
 
 var app = builder.Build();

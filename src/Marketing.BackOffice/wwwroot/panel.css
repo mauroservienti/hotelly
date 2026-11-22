@@ -1,0 +1,6 @@
+/* Marketing's panel styles, shipped with the panel. */
+.marketing-rating { margin: 0 0 0.5rem; }
+.marketing-rating strong { font-size: 1.1rem; }
+.marketing-reviews { display: grid; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.marketing-reviews li { padding: 0.4rem 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
+.marketing-reviews .meta { color: var(--muted); font-size: 0.8rem; }
