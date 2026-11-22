@@ -40,8 +40,16 @@ endpointConfiguration.EnableOutbox();
 builder.Services.AddNServiceBusEndpoint(endpointConfiguration);
 
 // Heyi wraps composition requests in the transactional session. Reads run
-// without one.
-builder.Services.AddHeyi(options => options.OpenSessionOptions(() => new SqlPersistenceOpenSessionOptions()));
+// without one. Committing the session sends a control message to the gateway
+// itself, which dispatches the outbox once the outbox record is stored. The
+// control message can arrive first: it's then delayed by the commit delay
+// increment, 2 seconds by default: with RabbitMQ's delayed delivery, changes
+// took about 4 seconds to reach the back ends. RabbitMQ delays in whole
+// seconds, so a shorter increment brings it down to about 1.
+builder.Services.AddHeyi(options => options.OpenSessionOptions(() => new SqlPersistenceOpenSessionOptions
+{
+    CommitDelayIncrement = TimeSpan.FromMilliseconds(100)
+}));
 
 // Composition handlers are found by scanning the assemblies deployed with the
 // gateway. Output formatters let handlers reject a request with an action
