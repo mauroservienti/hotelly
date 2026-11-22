@@ -47,6 +47,7 @@ var gateway = builder.AddProject<Projects.CompositionGateway>("composition-gatew
     .WithEnvironment("ConnectionStrings__registry", registry.CompositionConnectionString)
     .WithEnvironment("ConnectionStrings__sales", sales.CompositionConnectionString)
     .WithEnvironment("ConnectionStrings__marketing", marketing.CompositionConnectionString)
+    .WithEnvironment("ConnectionStrings__reservations", reservations.CompositionConnectionString)
     .WithReference(gatewayDatabase)
     .WithReference(rabbitmq)
     .WithEnvironment("RabbitMQ__ManagementApi", rabbitmqManagementApi)

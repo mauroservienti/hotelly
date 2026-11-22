@@ -16,6 +16,9 @@
   <Project Path="Registry.Search.Tests/Registry.Search.Tests.csproj" />
   <Project Path="Registry.Search/Registry.Search.csproj" />
   <Project Path="Reservations.Backend/Reservations.Backend.csproj" />
+  <Project Path="Reservations.BackOffice/Reservations.BackOffice.csproj" />
+  <Project Path="Reservations.Composition/Reservations.Composition.csproj" />
+  <Project Path="Reservations.Messages/Reservations.Messages.csproj" />
   <Project Path="Reservations.Search.Tests/Reservations.Search.Tests.csproj" />
   <Project Path="Reservations.Search/Reservations.Search.csproj" />
   <Project Path="Sales.Backend/Sales.Backend.csproj" />

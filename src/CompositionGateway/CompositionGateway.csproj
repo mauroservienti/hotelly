@@ -14,6 +14,7 @@
     <ProjectReference Include="..\Registry.Composition\Registry.Composition.csproj" />
     <ProjectReference Include="..\Sales.Composition\Sales.Composition.csproj" />
     <ProjectReference Include="..\Marketing.Composition\Marketing.Composition.csproj" />
+    <ProjectReference Include="..\Reservations.Composition\Reservations.Composition.csproj" />
     <ProjectReference Include="..\Registry.Search\Registry.Search.csproj" />
     <ProjectReference Include="..\Sales.Search\Sales.Search.csproj" />
     <ProjectReference Include="..\Reservations.Search\Reservations.Search.csproj" />
