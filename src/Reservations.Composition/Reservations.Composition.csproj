@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Heyi" Version="1.2.0" />
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+    <PackageReference Include="ServiceComposer.AspNetCore" Version="5.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Reservations.Messages\Reservations.Messages.csproj" />
+  </ItemGroup>
+
+</Project>

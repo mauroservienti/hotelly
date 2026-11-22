@@ -19,6 +19,7 @@ class ReservationsSetup(
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         await CreateSchema(cancellationToken);
+        await GrantCompositionAccess(cancellationToken);
         await Seed(cancellationToken);
 
         // Search only needs to know which nights are sold out. The row filter
@@ -53,6 +54,26 @@ class ReservationsSetup(
                 CHECK (booked BETWEEN 0 AND rooms)
             );
             ALTER TABLE reservations.availability REPLICA IDENTITY FULL
+            """);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    // Reservations' composition handlers run in the composition gateway, and
+    // read availability straight from this database: they're part of
+    // Reservations, deployed somewhere else. They get a role that can only
+    // read.
+    async Task GrantCompositionAccess(CancellationToken cancellationToken)
+    {
+        await using var command = reservations.CreateCommand("""
+            DO $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'reservations_composition') THEN
+                    CREATE ROLE reservations_composition LOGIN PASSWORD 'reservations_composition';
+                END IF;
+            END
+            $$;
+            GRANT USAGE ON SCHEMA reservations TO reservations_composition;
+            GRANT SELECT ON reservations.availability TO reservations_composition;
             """);
         await command.ExecuteNonQueryAsync(cancellationToken);
     }

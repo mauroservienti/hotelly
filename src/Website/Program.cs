@@ -1,5 +1,6 @@
 using Hotelly.BackOffice;
 using Registry.BackOffice;
+using Reservations.BackOffice;
 using Sales.BackOffice;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,7 @@ builder.Services.AddHttpClient("gateway", client =>
 builder.Services.AddSingleton<IReadOnlyList<BackOfficePanel>>([
     RegistryBackOffice.Panel,
     SalesBackOffice.Panel,
+    ReservationsBackOffice.Panel,
 ]);
 
 var app = builder.Build();

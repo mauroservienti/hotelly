@@ -1,6 +1,7 @@
 using Hotelly.Messaging;
 using Npgsql;
 using Reservations.Backend;
+using Reservations.Messages;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -13,6 +14,6 @@ builder.Services.AddHostedService<ReservationsSetup>();
 
 // Registered after the setup: hosted services start in order, so messages
 // are processed only once the database is ready.
-builder.Services.AddNServiceBusEndpoint(HotellyEndpoint.Create("Hotelly.Reservations", builder.Configuration));
+builder.Services.AddNServiceBusEndpoint(HotellyEndpoint.Create(ReservationsEndpoint.Name, builder.Configuration));
 
 builder.Build().Run();
