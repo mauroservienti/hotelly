@@ -370,3 +370,6 @@ a.button {
 
 .actions { display: flex; justify-content: flex-end; }
 .hotel .manage { font-size: 0.85rem; color: var(--accent); }
+
+/* Layout classes mustn't override the hidden attribute. */
+[hidden] { display: none !important; }

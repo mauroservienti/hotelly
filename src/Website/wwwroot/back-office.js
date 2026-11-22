@@ -84,12 +84,26 @@ async function create(panels) {
     // The gateway only sent commands: the services' back ends add the hotel
     // asynchronously, so it can take a moment to show up.
     status("Hotel added. Opening it…");
-    setTimeout(() => location.assign(`back-office.html?hotel=${id}`), 1000);
+    location.assign(`back-office.html?hotel=${id}`);
   });
 }
 
+// A hotel just added may not be there yet: the services' back ends process
+// the commands asynchronously. Retry for a few seconds before giving up.
+async function load() {
+  for (let attempt = 0; ; attempt++) {
+    const response = await fetch(`/back-office/hotels/${hotelId}`);
+    if (response.status !== 404 || attempt === 10) {
+      return response;
+    }
+    status("Loading the hotel…");
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+}
+
 async function edit(panels) {
-  const response = await fetch(`/back-office/hotels/${hotelId}`);
+  const response = await load();
+  status("");
   if (response.status === 404) {
     status("This hotel isn't there yet. If you just added it, the services may still be processing it: refresh in a moment.", "error");
     return;
