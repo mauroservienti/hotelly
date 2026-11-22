@@ -1,6 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
+    <PackageReference Include="Heyi" Version="1.2.0" />
+    <PackageReference Include="NServiceBus.Persistence.Sql" Version="9.0.7" />
+    <PackageReference Include="NServiceBus.Persistence.Sql.TransactionalSession" Version="9.0.7" />
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hotelly.Messaging\Hotelly.Messaging.csproj" />
     <ProjectReference Include="..\Search\Search.csproj" />
     <ProjectReference Include="..\Search.Composition\Search.Composition.csproj" />
     <ProjectReference Include="..\Registry.Composition\Registry.Composition.csproj" />

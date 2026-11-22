@@ -19,6 +19,20 @@ var searchServer = builder.AddPostgres("search-db")
     .WithArgs("-c", "max_logical_replication_workers=16", "-c", "max_worker_processes=24")
     .WithPgAdmin();
 
+// Services' back ends and the composition gateway exchange messages through
+// RabbitMQ. The management plugin's UI shows queues and exchanges.
+var rabbitmq = builder.AddRabbitMQ("rabbitmq")
+    .WithManagementPlugin();
+// The NServiceBus transport checks the broker through the management API.
+var rabbitmqManagementApi = rabbitmq.GetEndpoint("management");
+
+// The gateway's own database, for the NServiceBus outbox that makes sending
+// commands from composition handlers atomic.
+var gatewayDatabase = builder.AddPostgres("gateway-db")
+    .WithImageTag("18")
+    .WithPgAdmin()
+    .AddDatabase("gateway");
+
 var registry = AddService<Projects.Registry_Backend>("registry");
 var sales = AddService<Projects.Sales_Backend>("sales");
 var reservations = AddService<Projects.Reservations_Backend>("reservations");
@@ -33,6 +47,11 @@ var gateway = builder.AddProject<Projects.CompositionGateway>("composition-gatew
     .WithEnvironment("ConnectionStrings__registry", registry.CompositionConnectionString)
     .WithEnvironment("ConnectionStrings__sales", sales.CompositionConnectionString)
     .WithEnvironment("ConnectionStrings__marketing", marketing.CompositionConnectionString)
+    .WithReference(gatewayDatabase)
+    .WithReference(rabbitmq)
+    .WithEnvironment("RabbitMQ__ManagementApi", rabbitmqManagementApi)
+    .WaitFor(gatewayDatabase)
+    .WaitFor(rabbitmq)
     .WaitFor(searchServer)
     .WaitFor(registry.Backend)
     .WaitFor(sales.Backend)
@@ -69,7 +88,10 @@ Service AddService<TProject>(string name) where TProject : IProjectMetadata, new
         // the target port.
         .WithEnvironment("Replication__Publisher", ReferenceExpression.Create(
             $"host={server.Resource.Name} port=5432 dbname={name} user=postgres password={server.Resource.PasswordParameter}"))
+        .WithReference(rabbitmq)
+        .WithEnvironment("RabbitMQ__ManagementApi", rabbitmqManagementApi)
         .WaitFor(database)
+        .WaitFor(rabbitmq)
         .WaitFor(searchServer);
 
     // The service creates the read-only role its composition handlers use.
