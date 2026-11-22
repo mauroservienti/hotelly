@@ -5,6 +5,7 @@
     <ProjectReference Include="..\Registry.BackOffice\Registry.BackOffice.csproj" />
     <ProjectReference Include="..\Sales.BackOffice\Sales.BackOffice.csproj" />
     <ProjectReference Include="..\Reservations.BackOffice\Reservations.BackOffice.csproj" />
+    <ProjectReference Include="..\Marketing.BackOffice\Marketing.BackOffice.csproj" />
   </ItemGroup>
 
 </Project>
