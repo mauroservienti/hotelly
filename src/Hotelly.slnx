@@ -10,7 +10,9 @@
   <Project Path="Marketing.Search.Tests/Marketing.Search.Tests.csproj" />
   <Project Path="Marketing.Search/Marketing.Search.csproj" />
   <Project Path="Registry.Backend/Registry.Backend.csproj" />
+  <Project Path="Registry.BackOffice/Registry.BackOffice.csproj" />
   <Project Path="Registry.Composition/Registry.Composition.csproj" />
+  <Project Path="Registry.Messages/Registry.Messages.csproj" />
   <Project Path="Registry.Search.Tests/Registry.Search.Tests.csproj" />
   <Project Path="Registry.Search/Registry.Search.csproj" />
   <Project Path="Reservations.Backend/Reservations.Backend.csproj" />

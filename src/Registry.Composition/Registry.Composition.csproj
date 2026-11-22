@@ -1,10 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Heyi" Version="1.2.0" />
     <PackageReference Include="Npgsql" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Registry.Messages\Registry.Messages.csproj" />
     <ProjectReference Include="..\Search.Composition\Search.Composition.csproj" />
   </ItemGroup>
 

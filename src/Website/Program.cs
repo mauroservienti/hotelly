@@ -1,4 +1,5 @@
 using Hotelly.BackOffice;
+using Registry.BackOffice;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +12,9 @@ builder.Services.AddHttpClient("gateway", client =>
 // The back office hosts the services' panels. Each service ships its panel as
 // a Razor class library, and the website references it: adding a service's
 // panel means referencing its library and registering its panel here.
-builder.Services.AddSingleton<IReadOnlyList<BackOfficePanel>>([]);
+builder.Services.AddSingleton<IReadOnlyList<BackOfficePanel>>([
+    RegistryBackOffice.Panel,
+]);
 
 var app = builder.Build();
 
