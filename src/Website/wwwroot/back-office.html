@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hotelly back office</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body class="show-owners">
+  <header class="top">
+    <div class="brand">
+      <h1><a href="index.html">Hotelly</a> back office</h1>
+      <p id="subtitle">Each panel belongs to a service: it shows and edits only the data that service owns.</p>
+    </div>
+    <div class="top-actions">
+      <label class="switch" title="Color each panel by the service that owns it">
+        <input type="checkbox" id="show-owners" checked> Show who owns what
+      </label>
+      <a class="button" href="back-office.html">Add a hotel</a>
+    </div>
+  </header>
+
+  <main class="back-office">
+    <p id="status" class="status" role="status" hidden></p>
+
+    <!-- Creating a hotel: every service's panel contributes to one request. -->
+    <form id="create" class="panels" hidden>
+      <div id="create-panels" class="panels"></div>
+      <div class="actions">
+        <button type="submit">Add the hotel</button>
+      </div>
+    </form>
+
+    <!-- Editing a hotel: each panel saves on its own. -->
+    <div id="edit-panels" class="panels" hidden></div>
+
+    <p id="no-panels" class="muted" hidden>No service has deployed a panel to the back office yet.</p>
+  </main>
+
+  <script type="module" src="back-office.js"></script>
+</body>
+</html>

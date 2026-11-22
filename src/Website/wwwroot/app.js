@@ -211,6 +211,7 @@ function hotel(h) {
   stars.textContent = "★".repeat(h.stars);
   stars.setAttribute("aria-label", `${h.stars} stars`);
   el.querySelector(".city").textContent = h.city;
+  el.querySelector(".manage").href = `back-office.html?hotel=${h.id}`;
   el.querySelector(".amenities").replaceChildren(...h.amenities.map((a) => {
     const li = document.createElement("li");
     li.textContent = a.replace("-", " ");
